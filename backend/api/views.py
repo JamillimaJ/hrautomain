@@ -508,7 +508,7 @@ def upload_resume(request):
             'message': 'Only PDF files are allowed'
         }, status=400)
     
-    # Save file to data/local_upload
+    # Save file to data/local_upload (for manual uploads)
     resume_dir = settings.BASE_DIR / 'data' / 'local_upload'
     resume_dir.mkdir(parents=True, exist_ok=True)
     
@@ -555,15 +555,15 @@ def analyze_resumes(request):
         analysis_job.save()
         
         # Get all resumes from both folders
-        resume_folder = settings.BASE_DIR / "data" / "resumes"
-        local_upload_folder = settings.BASE_DIR / "data" / "local_upload"
+        resume_folder_drive = settings.BASE_DIR / "data" / "resumes"  # From Drive sync
+        resume_folder_upload = settings.BASE_DIR / "data" / "local_upload"  # From manual upload
         
         # Collect resume files from both folders
         resume_files = []
-        if resume_folder.exists():
-            resume_files.extend(list(resume_folder.glob("*.pdf")))
-        if local_upload_folder.exists():
-            resume_files.extend(list(local_upload_folder.glob("*.pdf")))
+        if resume_folder_drive.exists():
+            resume_files.extend(list(resume_folder_drive.glob("*.pdf")))
+        if resume_folder_upload.exists():
+            resume_files.extend(list(resume_folder_upload.glob("*.pdf")))
         
         analysis_job.total_resumes = len(resume_files)
         analysis_job.save()
@@ -611,23 +611,20 @@ def analyze_resumes(request):
         analysis_job.completed_at = timezone.now()
         analysis_job.save()
         
-        # Empty both folders after successful analysis
+        # Clear resume folders after successful analysis
         import shutil
-        if resume_folder.exists():
-            for file in resume_folder.glob("*.pdf"):
-                try:
+        try:
+            if resume_folder_drive.exists():
+                for file in resume_folder_drive.glob("*.pdf"):
                     file.unlink()
-                    print(f"Deleted: {file.name}")
-                except Exception as e:
-                    print(f"Error deleting {file.name}: {e}")
-        
-        if local_upload_folder.exists():
-            for file in local_upload_folder.glob("*.pdf"):
-                try:
+                print(f"✅ Cleared {resume_folder_drive}")
+            
+            if resume_folder_upload.exists():
+                for file in resume_folder_upload.glob("*.pdf"):
                     file.unlink()
-                    print(f"Deleted: {file.name}")
-                except Exception as e:
-                    print(f"Error deleting {file.name}: {e}")
+                print(f"✅ Cleared {resume_folder_upload}")
+        except Exception as e:
+            print(f"⚠️ Warning: Could not clear resume folders: {str(e)}")
         
         # Get shortlisted candidates
         shortlisted = Candidate.objects.filter(score__gte=80).order_by('-score')

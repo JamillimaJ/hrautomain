@@ -21,7 +21,7 @@ COPY src/ ./src/
 COPY data/ ./data/
 
 # Create necessary directories
-RUN mkdir -p /app/outputs/excel_reports /app/outputs/appointment_letters /app/data/local_upload /app/data/resumes
+RUN mkdir -p /app/outputs/excel_reports /app/outputs/appointment_letters
 
 # Set working directory to backend
 WORKDIR /app/backend
