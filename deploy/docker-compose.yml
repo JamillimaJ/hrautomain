@@ -11,6 +11,7 @@ services:
       - ../src:/app/src
       - ../data:/app/data
       - ../outputs:/app/outputs
+      - ../emailanalysis:/app/emailanalysis
       - ../.env:/app/.env
       - ../credentials.json:/app/credentials.json
       - ../token.json:/app/token.json
