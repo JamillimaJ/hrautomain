@@ -1,0 +1,38 @@
+# Core Framework
+Django==4.2.26
+djangorestframework==3.16.1
+django-cors-headers==4.9.0
+
+# Environment & API
+python-dotenv==1.1.1
+openai==1.106.1
+
+# Document Processing
+pymupdf==1.26.6
+python-magic==0.4.27
+pypdf==6.3.0
+PyPDF2==3.0.1
+python-docx==1.2.0
+
+# PDF Generation
+reportlab==4.4.10
+
+# Data Handling & Export
+pandas==2.3.1
+openpyxl==3.1.5
+numpy==2.2.6
+
+# Image/OCR Processing
+pillow==11.3.0
+opencv-python==4.12.0.88
+
+# Google Drive Integration
+google-api-python-client==2.187.0
+google-auth==2.40.3
+google-auth-httplib2==0.2.1
+google-auth-oauthlib==1.2.4
+
+# Additional Dependencies
+beautifulsoup4==4.13.5
+requests==2.32.5
+python-dateutil==2.9.0.post0
