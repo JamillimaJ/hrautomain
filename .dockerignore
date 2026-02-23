@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.pyc
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Logs
+*.log
+backend.log
+frontend.log
+emailanalysis.log
+
+# Build artifacts
+dist/
+build/
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+
+# Node modules (if any)
+node_modules/
+
+# Database (optional, keep if needed)
+# *.sqlite3
+
+# Temporary files
+*.tmp
+*.temp

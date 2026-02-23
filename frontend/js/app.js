@@ -1,5 +1,7 @@
-// API Configuration
-const API_BASE_URL = 'http://localhost:8000/api';
+// API Configuration - Auto-detect environment
+const API_BASE_URL = window.location.hostname === '103.149.105.113' 
+    ? 'http://103.149.105.113:5512/api' 
+    : 'http://localhost:8000/api';
 
 // State Management
 let currentPage = 'dashboard';

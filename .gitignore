@@ -50,11 +50,20 @@ local_settings.py
 *.key
 .env
 .env.local
+credentials.json
+token.json
+emailanalysis/credentials.json
+emailanalysis/token.json
 
 # Output files
+*.log
+backend.log
+frontend.log
+emailanalysis.log
 
 # Resume data (may contain sensitive information)
-data/resumes/*
+data/resumes/*.pdf
+backend/data/resumes/*.pdf
 resumes/*
 
 # Keep directory structure but ignore contents

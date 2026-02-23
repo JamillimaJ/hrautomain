@@ -16,9 +16,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 SECRET_KEY = 'django-insecure-hr-automation-dev-key-change-in-production'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*', '103.149.105.113', 'localhost', '127.0.0.1']
 
 # Application definition
 INSTALLED_APPS = [
@@ -113,9 +113,16 @@ REST_FRAMEWORK = {
     ],
 }
 
-# CORS settings
+# CORS settings - Allow frontend to connect
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+    'http://localhost:5511',
+    'http://103.149.105.113:5511',
+]
+CORS_ALLOW_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
+CORS_ALLOW_HEADERS = ['*']
 
 # File upload settings
 MEDIA_URL = '/media/'
