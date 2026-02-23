@@ -571,10 +571,7 @@ def analyze_resumes(request):
         if not resume_files:
             raise Exception("No resume files found in data/resumes or data/local_upload")
         
-        # Clear previous candidates
-        Candidate.objects.all().delete()
-        
-        # Process each resume
+        # Process each resume (keep existing candidates, just add new ones)
         for resume_file in resume_files:
             try:
                 resume_text = extract_text(str(resume_file))
