@@ -22,42 +22,50 @@ echo ""
 
 # Step 1: Install Docker and Docker Compose on VPS
 echo -e "${YELLOW}📦 Installing Docker and Docker Compose on VPS...${NC}"
-echo "This will prompt for your VPS sudo password..."
-ssh -t ${VPS_USER}@${VPS_HOST} << 'ENDSSH'
-    set -e
-    
-    echo "Updating system packages..."
-    sudo apt-get update -qq
-    
-    echo "Installing prerequisites..."
-    sudo apt-get install -y -qq apt-transport-https ca-certificates curl software-properties-common git
-    
-    # Install Docker if not already installed
-    if ! command -v docker &> /dev/null; then
-        echo "Installing Docker..."
-        curl -fsSL https://get.docker.com -o get-docker.sh
-        sudo sh get-docker.sh
-        sudo usermod -aG docker ${USER}
-        rm get-docker.sh
-        echo "✅ Docker installed successfully"
-    else
-        echo "✅ Docker already installed"
-    fi
-    
-    # Install Docker Compose if not already installed
-    if ! command -v docker-compose &> /dev/null; then
-        echo "Installing Docker Compose..."
-        sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-        sudo chmod +x /usr/local/bin/docker-compose
-        echo "✅ Docker Compose installed successfully"
-    else
-        echo "✅ Docker Compose already installed"
-    fi
-    
-    echo ""
-    echo "✅ Docker installation complete!"
-    echo "Note: You may need to log out and back in for Docker group changes to take effect"
-ENDSSH
+echo ""
+echo "Creating installation script on VPS..."
+
+# Create installation script on VPS
+ssh ${VPS_USER}@${VPS_HOST} 'cat > /tmp/install-docker.sh << "EOF"
+#!/bin/bash
+set -e
+
+echo "Updating system packages..."
+sudo apt-get update -qq
+
+echo "Installing prerequisites..."
+sudo apt-get install -y -qq apt-transport-https ca-certificates curl software-properties-common git
+
+# Install Docker if not already installed
+if ! command -v docker &> /dev/null; then
+    echo "Installing Docker..."
+    curl -fsSL https://get.docker.com -o /tmp/get-docker.sh
+    sudo sh /tmp/get-docker.sh
+    sudo usermod -aG docker $USER
+    rm /tmp/get-docker.sh
+    echo "✅ Docker installed successfully"
+else
+    echo "✅ Docker already installed"
+fi
+
+# Install Docker Compose if not already installed
+if ! command -v docker-compose &> /dev/null; then
+    echo "Installing Docker Compose..."
+    sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    sudo chmod +x /usr/local/bin/docker-compose
+    echo "✅ Docker Compose installed successfully"
+else
+    echo "✅ Docker Compose already installed"
+fi
+
+echo ""
+echo "✅ Docker installation complete!"
+echo "Note: You may need to log out and back in for Docker group changes to take effect"
+EOF
+chmod +x /tmp/install-docker.sh'
+
+echo "Running installation script (will prompt for sudo password)..."
+ssh -t ${VPS_USER}@${VPS_HOST} '/tmp/install-docker.sh && rm /tmp/install-docker.sh'
 
 # Step 2: Clone repository
 echo -e "${YELLOW}📥 Cloning repository to VPS...${NC}"
@@ -110,18 +118,24 @@ ENDSSH
 
 # Step 6: Configure firewall (if needed)
 echo -e "${YELLOW}🔥 Configuring firewall...${NC}"
-ssh -t ${VPS_USER}@${VPS_HOST} << 'ENDSSH'
-    if command -v ufw &> /dev/null; then
-        echo "Configuring UFW firewall..."
-        sudo ufw allow 5511/tcp
-        sudo ufw allow 5512/tcp
-        sudo ufw allow 22/tcp
-        sudo ufw --force enable || echo "Note: Firewall may already be configured"
-        echo "✅ Firewall configured"
-    else
-        echo "⚠️  UFW not installed, skipping firewall configuration"
-    fi
-ENDSSH
+
+# Create firewall script on VPS
+ssh ${VPS_USER}@${VPS_HOST} 'cat > /tmp/setup-firewall.sh << "EOF"
+#!/bin/bash
+if command -v ufw &> /dev/null; then
+    echo "Configuring UFW firewall..."
+    sudo ufw allow 5511/tcp
+    sudo ufw allow 5512/tcp
+    sudo ufw allow 22/tcp
+    sudo ufw --force enable 2>/dev/null || echo "Note: Firewall may already be configured"
+    echo "✅ Firewall configured"
+else
+    echo "⚠️  UFW not installed, skipping firewall configuration"
+fi
+EOF
+chmod +x /tmp/setup-firewall.sh'
+
+ssh -t ${VPS_USER}@${VPS_HOST} '/tmp/setup-firewall.sh && rm /tmp/setup-firewall.sh'
 
 echo ""
 echo -e "${GREEN}✨ Initial setup complete!${NC}"
