@@ -131,17 +131,38 @@ body {
 .btn-icon {
     background: var(--light-bg);
     border: none;
-    padding: 0.75rem;
+    padding: 0.6rem 0.75rem;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
     color: var(--text-secondary);
+    font-size: 0.9rem;
 }
 
 .btn-icon:hover {
+    transform: scale(1.05);
+}
+
+.btn-icon.btn-view:hover {
     background: var(--primary-color);
     color: var(--white);
-    transform: scale(1.05);
+}
+
+.btn-icon.btn-notify:hover {
+    background: var(--secondary-color);
+    color: var(--white);
+}
+
+.btn-icon.btn-delete:hover {
+    background: var(--danger-color);
+    color: var(--white);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: flex-start;
 }
 
 .user-info {

@@ -247,12 +247,17 @@ function displayCandidates(candidates) {
                     </select>
                 </td>
                 <td>
-                    <button class="btn-icon" onclick="viewCandidate(${candidate.id})" title="View Details">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                    <button class="btn-icon" onclick="notifyCandidate(${candidate.id})" title="Send Notification">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
+                    <div class="action-buttons">
+                        <button class="btn-icon btn-view" onclick="viewCandidate(${candidate.id})" title="View Details">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn-icon btn-notify" onclick="notifyCandidate(${candidate.id})" title="Send Notification">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                        <button class="btn-icon btn-delete" onclick="deleteCandidate(${candidate.id}, '${candidate.candidate_name}')" title="Delete Candidate">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
                 </td>
             </tr>
         `;
@@ -377,6 +382,34 @@ async function updateCandidateStatus(id, newStatus) {
         console.error('Error updating status:', error);
         showToast('Failed to update status', 'error');
         selectElement.value = previousStatus;
+    }
+}
+
+async function deleteCandidate(id, candidateName) {
+    if (!confirm(`Are you sure you want to delete ${candidateName}? This action cannot be undone.`)) {
+        return;
+    }
+    
+    showLoading();
+    try {
+        const response = await fetch(`${API_BASE_URL}/candidates/${id}/delete_candidate/`, {
+            method: 'DELETE'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast(`${candidateName} deleted successfully`, 'success');
+            loadCandidates();
+            loadDashboardStats();
+        } else {
+            showToast(data.message || 'Failed to delete candidate', 'error');
+        }
+    } catch (error) {
+        console.error('Error deleting candidate:', error);
+        showToast('Failed to delete candidate', 'error');
+    } finally {
+        hideLoading();
     }
 }
 

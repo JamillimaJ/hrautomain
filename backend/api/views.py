@@ -224,6 +224,24 @@ class CandidateViewSet(viewsets.ModelViewSet):
             'messages': messages
         })
     
+    @action(detail=True, methods=['delete'])
+    def delete_candidate(self, request, pk=None):
+        """Delete a candidate"""
+        try:
+            candidate = self.get_object()
+            candidate_name = candidate.candidate_name
+            candidate.delete()
+            
+            return Response({
+                'success': True,
+                'message': f'Candidate {candidate_name} deleted successfully'
+            })
+        except Exception as e:
+            return Response({
+                'success': False,
+                'message': f'Error deleting candidate: {str(e)}'
+            }, status=500)
+    
     @action(detail=True, methods=['post'])
     def send_appointment_letter(self, request, pk=None):
         """Send appointment letter to a specific candidate"""
