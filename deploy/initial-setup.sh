@@ -22,14 +22,15 @@ echo ""
 
 # Step 1: Install Docker and Docker Compose on VPS
 echo -e "${YELLOW}📦 Installing Docker and Docker Compose on VPS...${NC}"
-ssh ${VPS_USER}@${VPS_HOST} << 'ENDSSH'
+echo "This will prompt for your VPS sudo password..."
+ssh -t ${VPS_USER}@${VPS_HOST} << 'ENDSSH'
     set -e
     
     echo "Updating system packages..."
-    sudo apt-get update
+    sudo apt-get update -qq
     
     echo "Installing prerequisites..."
-    sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common git
+    sudo apt-get install -y -qq apt-transport-https ca-certificates curl software-properties-common git
     
     # Install Docker if not already installed
     if ! command -v docker &> /dev/null; then
@@ -38,8 +39,9 @@ ssh ${VPS_USER}@${VPS_HOST} << 'ENDSSH'
         sudo sh get-docker.sh
         sudo usermod -aG docker ${USER}
         rm get-docker.sh
+        echo "✅ Docker installed successfully"
     else
-        echo "Docker already installed"
+        echo "✅ Docker already installed"
     fi
     
     # Install Docker Compose if not already installed
@@ -47,11 +49,14 @@ ssh ${VPS_USER}@${VPS_HOST} << 'ENDSSH'
         echo "Installing Docker Compose..."
         sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
         sudo chmod +x /usr/local/bin/docker-compose
+        echo "✅ Docker Compose installed successfully"
     else
-        echo "Docker Compose already installed"
+        echo "✅ Docker Compose already installed"
     fi
     
-    echo "✅ Docker installation complete"
+    echo ""
+    echo "✅ Docker installation complete!"
+    echo "Note: You may need to log out and back in for Docker group changes to take effect"
 ENDSSH
 
 # Step 2: Clone repository
@@ -105,16 +110,16 @@ ENDSSH
 
 # Step 6: Configure firewall (if needed)
 echo -e "${YELLOW}🔥 Configuring firewall...${NC}"
-ssh ${VPS_USER}@${VPS_HOST} << 'ENDSSH'
+ssh -t ${VPS_USER}@${VPS_HOST} << 'ENDSSH'
     if command -v ufw &> /dev/null; then
         echo "Configuring UFW firewall..."
         sudo ufw allow 5511/tcp
         sudo ufw allow 5512/tcp
         sudo ufw allow 22/tcp
-        sudo ufw --force enable
+        sudo ufw --force enable || echo "Note: Firewall may already be configured"
         echo "✅ Firewall configured"
     else
-        echo "UFW not installed, skipping firewall configuration"
+        echo "⚠️  UFW not installed, skipping firewall configuration"
     fi
 ENDSSH
 

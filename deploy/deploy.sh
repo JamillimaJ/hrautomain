@@ -36,16 +36,20 @@ ssh ${VPS_USER}@${VPS_HOST} << 'ENDSSH'
     git pull origin master
     
     echo "🐳 Rebuilding and restarting Docker containers..."
-    docker-compose down
+    docker-compose down || true
     docker-compose build --no-cache
     docker-compose up -d
     
+    echo "⏳ Waiting for containers to start..."
+    sleep 5
+    
     echo "🧹 Cleaning up old Docker images..."
-    docker image prune -f
+    docker image prune -f || true
     
     echo "📊 Checking container status..."
     docker-compose ps
     
+    echo ""
     echo "✅ Deployment complete!"
 ENDSSH
 
