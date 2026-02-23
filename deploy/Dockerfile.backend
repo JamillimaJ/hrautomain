@@ -1,3 +1,4 @@
+# Dockerfile for Django Backend
 FROM python:3.11-slim
 
 # Set working directory
@@ -6,29 +7,22 @@ WORKDIR /app
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     gcc \
-    python3-dev \
+    g++ \
     libmagic1 \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements
+# Copy requirements first for better caching
 COPY requirements.txt .
-
-# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
+# Copy backend code
 COPY backend/ ./backend/
 COPY src/ ./src/
 COPY data/ ./data/
-COPY outputs/ ./outputs/
-
-# Copy credentials (will be overridden by volume mounts in production)
-COPY credentials.json ./credentials.json
-COPY token.json ./token.json
-COPY .env ./.env
+COPY .env .env
 
 # Create necessary directories
-RUN mkdir -p data/resumes outputs/appointment_letters outputs/excel_reports
+RUN mkdir -p /app/outputs/excel_reports /app/outputs/appointment_letters
 
 # Set working directory to backend
 WORKDIR /app/backend
@@ -39,5 +33,5 @@ RUN python manage.py collectstatic --noinput || true
 # Expose port
 EXPOSE 5512
 
-# Run server
+# Run the application
 CMD ["python", "manage.py", "runserver", "0.0.0.0:5512"]

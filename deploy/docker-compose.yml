@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.backend
+    container_name: hrautomain-backend
+    ports:
+      - "5512:5512"
+    volumes:
+      - ../backend:/app/backend
+      - ../src:/app/src
+      - ../data:/app/data
+      - ../outputs:/app/outputs
+      - ../.env:/app/.env
+      - ../credentials.json:/app/credentials.json
+      - ../token.json:/app/token.json
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DJANGO_SETTINGS_MODULE=app.settings
+    restart: unless-stopped
+    networks:
+      - hrautomain-network
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.frontend
+    container_name: hrautomain-frontend
+    ports:
+      - "5511:5511"
+    volumes:
+      - ../frontend:/app/frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - hrautomain-network
+
+networks:
+  hrautomain-network:
+    driver: bridge

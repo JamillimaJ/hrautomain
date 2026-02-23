@@ -1,0 +1,15 @@
+# Dockerfile for Frontend
+FROM python:3.11-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Copy frontend files
+COPY frontend/ ./frontend/
+
+# Expose port
+EXPOSE 5511
+
+# Run simple HTTP server
+WORKDIR /app/frontend
+CMD ["python", "-m", "http.server", "5511"]

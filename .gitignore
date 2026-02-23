@@ -55,15 +55,21 @@ token.json
 emailanalysis/credentials.json
 emailanalysis/token.json
 
-# Output files
+# Database
+*.sqlite3
+db.sqlite3
+backend/db.sqlite3
+
+# Deployment logs
 *.log
 backend.log
 frontend.log
 emailanalysis.log
 
+# Output files
+
 # Resume data (may contain sensitive information)
-data/resumes/*.pdf
-backend/data/resumes/*.pdf
+data/resumes/*
 resumes/*
 
 # Keep directory structure but ignore contents

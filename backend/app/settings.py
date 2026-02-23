@@ -13,12 +13,12 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-hr-automation-dev-key-change-in-production'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-hr-automation-dev-key-change-in-production')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
+DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['*', '103.149.105.113', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',') if os.getenv('ALLOWED_HOSTS') else ['*']
 
 # Application definition
 INSTALLED_APPS = [
@@ -113,16 +113,9 @@ REST_FRAMEWORK = {
     ],
 }
 
-# CORS settings - Allow frontend to connect
+# CORS settings
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
-    'http://localhost:5511',
-    'http://103.149.105.113:5511',
-]
-CORS_ALLOW_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
-CORS_ALLOW_HEADERS = ['*']
 
 # File upload settings
 MEDIA_URL = '/media/'
