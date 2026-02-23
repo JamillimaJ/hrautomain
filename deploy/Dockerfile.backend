@@ -19,7 +19,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/ ./backend/
 COPY src/ ./src/
 COPY data/ ./data/
-COPY .env .env
 
 # Create necessary directories
 RUN mkdir -p /app/outputs/excel_reports /app/outputs/appointment_letters
