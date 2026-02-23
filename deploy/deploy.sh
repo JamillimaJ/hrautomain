@@ -9,12 +9,13 @@ set -e
 VPS_USER="devuser"
 VPS_IP="103.149.105.113"
 VPS_PATH="/home/devuser/hrautomation"
-REPO_URL="https://github.com/JamillimaJ/hrautomain.git"
+LOCAL_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 echo "🚀 Starting HR Automation Deployment"
 echo "=================================="
 echo "VPS: ${VPS_USER}@${VPS_IP}"
 echo "Path: ${VPS_PATH}"
+echo "Local: ${LOCAL_PATH}"
 echo ""
 
 # Check if SSH connection works
@@ -24,29 +25,44 @@ ssh -o ConnectTimeout=10 ${VPS_USER}@${VPS_IP} "echo 'SSH connection successful'
     exit 1
 }
 
-# Deploy to VPS
+# Create directory on VPS
 echo ""
-echo "📦 Deploying to VPS..."
+echo "📂 Creating directory on VPS..."
+ssh ${VPS_USER}@${VPS_IP} "mkdir -p ${VPS_PATH}"
+
+# Sync files from local to VPS using rsync
+echo ""
+echo "📦 Syncing files to VPS (this may take a moment)..."
+rsync -avz --progress \
+    --exclude '.git' \
+    --exclude '.gitignore' \
+    --exclude '__pycache__' \
+    --exclude '*.pyc' \
+    --exclude 'venv' \
+    --exclude '.venv' \
+    --exclude 'env' \
+    --exclude '*.log' \
+    --exclude '.env' \
+    --exclude 'credentials.json' \
+    --exclude 'token.json' \
+    --exclude '*.sqlite3' \
+    --exclude 'db.sqlite3' \
+    --exclude '.DS_Store' \
+    --exclude '.vscode' \
+    --exclude '.idea' \
+    "${LOCAL_PATH}/" "${VPS_USER}@${VPS_IP}:${VPS_PATH}/"
+
+echo ""
+echo "✅ Files synced successfully!"
+
+# Now run setup on VPS
+echo ""
+echo "🔧 Setting up on VPS..."
 ssh ${VPS_USER}@${VPS_IP} bash <<'ENDSSH'
 set -e
 
 VPS_PATH="/home/devuser/hrautomation"
-REPO_URL="https://github.com/JamillimaJ/hrautomain.git"
-
-echo "📂 Setting up directory..."
-mkdir -p ${VPS_PATH}
 cd ${VPS_PATH}
-
-# Clone or pull repository
-if [ -d ".git" ]; then
-    echo "📥 Pulling latest changes..."
-    git fetch origin
-    git reset --hard origin/master
-    git pull origin master
-else
-    echo "📥 Cloning repository..."
-    git clone ${REPO_URL} .
-fi
 
 # Check if .env exists
 if [ ! -f ".env" ]; then

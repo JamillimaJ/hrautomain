@@ -5,6 +5,12 @@
 
 set -e
 
+# Configuration
+VPS_USER="devuser"
+VPS_IP="103.149.105.113"
+VPS_PATH="/home/devuser/hrautomation"
+LOCAL_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
 echo "🔄 Updating HR Automation System"
 echo "================================"
 echo ""
@@ -19,7 +25,7 @@ if [[ -n $(git status -s) ]]; then
     echo ""
     
     # Ask for commit message
-    read -p "Enter commit message: " COMMIT_MSG
+    read -p "Enter commit message (or press Enter for auto-generated): " COMMIT_MSG
     
     if [ -z "$COMMIT_MSG" ]; then
         COMMIT_MSG="Update: $(date '+%Y-%m-%d %H:%M:%S')"
@@ -33,19 +39,41 @@ if [[ -n $(git status -s) ]]; then
     echo "✅ Changes pushed to GitHub"
 else
     echo "ℹ️  No local changes to commit"
-    git push origin master || echo "Already up to date"
+    git push origin master 2>/dev/null || echo "Already up to date"
 fi
 
 echo ""
-echo "🚀 Deploying to VPS..."
+echo "🚀 Syncing to VPS..."
 echo ""
 
-# Configuration
-VPS_USER="devuser"
-VPS_IP="103.149.105.113"
-VPS_PATH="/home/devuser/hrautomation"
+# Sync files from local to VPS using rsync
+rsync -avz --progress \
+    --exclude '.git' \
+    --exclude '.gitignore' \
+    --exclude '__pycache__' \
+    --exclude '*.pyc' \
+    --exclude 'venv' \
+    --exclude '.venv' \
+    --exclude 'env' \
+    --exclude '*.log' \
+    --exclude '.env' \
+    --exclude 'credentials.json' \
+    --exclude 'token.json' \
+    --exclude '*.sqlite3' \
+    --exclude 'db.sqlite3' \
+    --exclude '.DS_Store' \
+    --exclude '.vscode' \
+    --exclude '.idea' \
+    "${LOCAL_PATH}/" "${VPS_USER}@${VPS_IP}:${VPS_PATH}/"
+
+echo ""
+echo "✅ Files synced!"
 
 # Update VPS
+echo ""
+echo "🔄 Restarting containers..."
+echo ""
+
 ssh ${VPS_USER}@${VPS_IP} bash <<'ENDSSH'
 set -e
 
@@ -53,9 +81,6 @@ VPS_PATH="/home/devuser/hrautomation"
 
 echo "📂 Navigating to project directory..."
 cd ${VPS_PATH}
-
-echo "📥 Pulling latest changes..."
-git pull origin master
 
 echo "🔄 Restarting containers..."
 cd deploy
