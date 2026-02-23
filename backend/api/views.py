@@ -508,8 +508,8 @@ def upload_resume(request):
             'message': 'Only PDF files are allowed'
         }, status=400)
     
-    # Save file to data/resumes
-    resume_dir = settings.BASE_DIR / 'data' / 'resumes'
+    # Save file to data/local_upload
+    resume_dir = settings.BASE_DIR / 'data' / 'local_upload'
     resume_dir.mkdir(parents=True, exist_ok=True)
     
     file_path = resume_dir / file.name
@@ -554,18 +554,22 @@ def analyze_resumes(request):
         analysis_job.job_description = active_jd
         analysis_job.save()
         
-        # Get all resumes
+        # Get all resumes from both folders
         resume_folder = settings.BASE_DIR / "data" / "resumes"
+        local_upload_folder = settings.BASE_DIR / "data" / "local_upload"
         
-        if not resume_folder.exists():
-            raise Exception("Resume folder not found")
+        # Collect resume files from both folders
+        resume_files = []
+        if resume_folder.exists():
+            resume_files.extend(list(resume_folder.glob("*.pdf")))
+        if local_upload_folder.exists():
+            resume_files.extend(list(local_upload_folder.glob("*.pdf")))
         
-        resume_files = list(resume_folder.glob("*.pdf"))
         analysis_job.total_resumes = len(resume_files)
         analysis_job.save()
         
         if not resume_files:
-            raise Exception("No resume files found in data/resumes")
+            raise Exception("No resume files found in data/resumes or data/local_upload")
         
         # Clear previous candidates
         Candidate.objects.all().delete()
@@ -607,13 +611,31 @@ def analyze_resumes(request):
         analysis_job.completed_at = timezone.now()
         analysis_job.save()
         
+        # Empty both folders after successful analysis
+        import shutil
+        if resume_folder.exists():
+            for file in resume_folder.glob("*.pdf"):
+                try:
+                    file.unlink()
+                    print(f"Deleted: {file.name}")
+                except Exception as e:
+                    print(f"Error deleting {file.name}: {e}")
+        
+        if local_upload_folder.exists():
+            for file in local_upload_folder.glob("*.pdf"):
+                try:
+                    file.unlink()
+                    print(f"Deleted: {file.name}")
+                except Exception as e:
+                    print(f"Error deleting {file.name}: {e}")
+        
         # Get shortlisted candidates
         shortlisted = Candidate.objects.filter(score__gte=80).order_by('-score')
         serializer = CandidateSerializer(shortlisted, many=True)
         
         return Response({
             'success': True,
-            'message': f'Analysis completed. {analysis_job.shortlisted_count} candidates shortlisted.',
+            'message': f'Analysis completed. {analysis_job.shortlisted_count} candidates shortlisted. Resume folders cleared.',
             'job_id': analysis_job.id,
             'total_processed': analysis_job.processed_resumes,
             'shortlisted_count': analysis_job.shortlisted_count,
