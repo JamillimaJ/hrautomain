@@ -50,10 +50,7 @@ local_settings.py
 *.key
 .env
 .env.local
-credentials.json
-token.json
-emailanalysis/credentials.json
-emailanalysis/token.json
+
 
 # Database
 *.sqlite3
