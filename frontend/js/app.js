@@ -1,17 +1,17 @@
 // API Configuration - Auto-detect environment
 const API_BASE_URL = (() => {
     const hostname = window.location.hostname;
-    if (hostname === 'http://hra.betopialimited.com/') {
-        return 'http://hra.betopialimited.com/api';}
 
+    if (hostname === 'hra.betopialimited.com') {
+        return '/api';
+    } 
     else if (hostname === '103.149.105.113') {
         return 'http://103.149.105.113:5512/api';
-
     } 
     else if (hostname === 'localhost' || hostname === '127.0.0.1') {
         return 'http://localhost:5512/api';
     }
-    // Fallback to relative URL
+
     return '/api';
 })();
 
