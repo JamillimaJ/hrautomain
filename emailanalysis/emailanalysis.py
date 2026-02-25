@@ -15,8 +15,12 @@ CHECK_INTERVAL = 60
 CSV_FILENAME = 'ai_analyzed_emails.csv'
 JSON_FILENAME = 'ai_analyzed_emails.json'
 
-# OpenAI Client Setup
-client = OpenAI(api_key="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")
+
+# OpenAI Client Setup - use API key from environment variable
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+if not OPENAI_API_KEY:
+    raise RuntimeError("OPENAI_API_KEY not set in environment. Please check your .env file and environment variables.")
+client = OpenAI(api_key=OPENAI_API_KEY)
 
 def analyze_with_ai(subject, body):
     try:
