@@ -85,8 +85,7 @@ cd ${VPS_PATH}
 echo "🔄 Restarting containers..."
 cd deploy
 docker-compose down
-docker-compose build --no-cache
-docker-compose up -d
+docker-compose up -d --build
 
 echo "⏳ Waiting for services to restart..."
 sleep 10

@@ -16,6 +16,8 @@ services:
       - ../credentials.json:/app/credentials.json
       - ../token.json:/app/token.json
       - ../db.sqlite3:/app/db.sqlite3
+    env_file:
+      - ../.env
     environment:
       - PYTHONUNBUFFERED=1
       - DJANGO_SETTINGS_MODULE=app.settings
