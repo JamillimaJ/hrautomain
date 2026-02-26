@@ -1,5 +1,29 @@
 [
     {
+        "Date": "Thu, 26 Feb 2026 08:18:23 +0600",
+        "From": "Jamil Hasan <jamil.gptai@gmail.com>",
+        "Subject": "Slightly delayed for our [Time] meeting",
+        "Body": "Hi Abir,\r\n\r\nPlease accept my apologies\u2014I\u2019m running about 10 minutes late to our meeting.\r\n\r\nThanks,\r\nJamil",
+        "Flag": "not spam",
+        "Intention": "scheduling",
+        "Type": "Office",
+        "Summary": "Jamil informs Abir that they will be about 10 minutes late to a meeting.",
+        "Score": 75,
+        "ID": "19c97bda86aee486"
+    },
+    {
+        "Date": "Thu, 26 Feb 2026 00:55:49 +0600",
+        "From": "Jamil Hasan <jamil.gptai@gmail.com>",
+        "Subject": "About Appointment",
+        "Body": "Dear Abir,\r\n\r\nCongratulations!\r\n\r\nWe are pleased to offer you the position of Production Manager at Urmi Group.\r\n\r\nPlease confirm your acceptance of this offer by replying to this email.\r\n\r\nBest regards,\r\nJamil Hasan",
+        "Flag": "not spam",
+        "Intention": "transactional",
+        "Type": "Office",
+        "Summary": "Appointment offer for the position of Production Manager at Urmi Group.",
+        "Score": 85,
+        "ID": "19c96287cfee9387"
+    },
+    {
         "Date": "Mon, 23 Feb 2026 08:52:00 +0600",
         "From": "Jamil Hasan Rahul <jamilhasanrahul@gmail.com>",
         "Subject": "about nothing",
